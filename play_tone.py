@@ -2,6 +2,7 @@ import numpy as np
 #import pyaudio
 import argparse
 import matplotlib.pyplot as plt
+import scipy as sp
 
 parser = argparse.ArgumentParser(
                     prog='play_tone',
@@ -18,6 +19,7 @@ parser.add_argument('--amplitude', nargs='+', type=float, default=[1.0], help='A
 parser.add_argument('--offset', nargs='+', type=float, default=[0], help='offset of the generated tone')
 parser.add_argument('--save_to', help='file_path for tone to be saved to')
 parser.add_argument('--sample_rate', type=float, default=40.0, help='Sample rate of tone in KHz')
+parser.add_argument('--db', default=False, action='store_true', help='converts fft to dB')
 args = parser.parse_args()
 
 data = None
@@ -29,7 +31,28 @@ sample_rate = args.sample_rate
 num_samples = 0
 xf = None
 
-def gen_single_tone(freq, dur, sample_rate = 40, amp=1, offset=0):
+def find_peaks(fft):
+    fft_db = np.full(len(fft), 0, dtype=float)
+    for ii, i in enumerate(fft): 
+        fft_db[ii] = i**2
+
+    noise_floor = np.mean(fft_db)
+    
+
+
+
+def shift_tone(data, shift, dur, sample_rate, amp, offset):
+    '''
+    data: fft data
+    shift: shift all freqs by this in kHz
+    dur: length of the tone in seconds
+    sample_rate = sampling rate
+    amp = idk - imp later
+    offswet = idk - imp later
+    '''
+    pass
+
+def gen_single_tone(freq, dur, sample_rate, amp, offset):
     '''
     Generates a sinosoidal tone sampled @ 40KHZ
     freq: frequency of the tone in KHz
@@ -79,8 +102,6 @@ def gen_multi_tone(freqs, dur, sample_rate=40, amp=[1], offset=[0]):
             time += inc_amount
     xf = np.linspace(0.0, 1.0/(2.0*inc_amount), num_samples//2)
     return data, time_axis, xf, num_samples
-
-    
 
 if args.arb_tone is not None:
     data, time_axis, xf, num_samples = gen_single_tone(args.arb_tone, args.tone_length, args.sample_rate, args.amplitude, args.offset)
